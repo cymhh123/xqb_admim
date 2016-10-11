@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.posts.dao.UserCircleDao">
+
+	<sql id="UserCircleColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.circle_id AS "circleId",
+		a.oper_type AS "operType",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus"
+	</sql>
+
+	<sql id="UserCircleJoins">
+
+	</sql>
+
+	<select id="get" resultType="UserCircle">
+		SELECT
+		<include refid="UserCircleColumns"/>
+		FROM u_user_circle a
+		<include refid="UserCircleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="UserCircle">
+		SELECT
+		<include refid="UserCircleColumns"/>
+		FROM u_user_circle a
+		<include refid="UserCircleJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="userId != null and userId != ''">
+				AND a.user_id = #{userId}
+			</if>
+			<if test="circleId != null and circleId != ''">
+				AND a.circle_id = #{circleId}
+			</if>
+			<if test="operType != null">
+				AND a.oper_type = #{operType}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO u_user_circle(
+		id,
+		user_id,
+		circle_id,
+		oper_type,
+		create_date,
+		upd_date,
+		del_status
+		) VALUES (
+		#{id},
+		#{userId},
+		#{circleId},
+		#{operType},
+		#{createDate},
+		#{updDate},
+		#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE u_user_circle
+		<set>
+			<if test="userId != null and userId != ''">
+				user_id = #{userId},
+			</if>
+			<if test="circleId != null and circleId != ''">
+				circle_id = #{circleId},
+			</if>
+			<if test="operType != null">
+				oper_type = #{operType},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE u_user_circle SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

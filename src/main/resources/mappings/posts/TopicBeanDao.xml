@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.posts.dao.TopicBeanDao">
+    
+	<sql id="topicBeanColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.img_url AS "imgUrl",
+		a.des AS "des",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus",
+		(SELECT count(*) FROM u_circle_list c WHERE c.circle_id = a.id) AS "postsNum"
+	</sql>
+	
+	<sql id="topicBeanJoins">
+	</sql>
+    
+	<select id="get" resultType="TopicBean">
+		SELECT 
+			<include refid="topicBeanColumns"/>
+		FROM u_circle a
+		<include refid="topicBeanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TopicBean">
+		SELECT 
+			<include refid="topicBeanColumns"/>
+		FROM u_circle a
+		<include refid="topicBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO u_circle(
+			id,
+			title,
+			img_url,
+			des,
+			create_date,
+			upd_date,
+			del_status
+		) VALUES (
+			#{id},
+			#{title},
+			#{imgUrl},
+			#{des},
+			#{createDate},
+			#{updDate},
+			#{delStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE u_circle SET 	
+			title = #{title},
+			img_url = #{imgUrl},
+			des = #{des},
+			upd_date = #{updDate},
+			del_status = #{delStatus}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE u_circle set del_status = 1
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

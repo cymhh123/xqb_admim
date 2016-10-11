@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.banner.dao.BannerDao">
+
+	<sql id="BannerColumns">
+		a.id AS "id",
+		a.img_url AS "imgUrl",
+		a.flag AS "flag",
+		a.param AS "param",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus"
+	</sql>
+
+	<sql id="BannerJoins">
+
+	</sql>
+
+	<select id="get" resultType="Banner">
+		SELECT
+		<include refid="BannerColumns"/>
+		FROM b_banner a
+		<include refid="BannerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Banner">
+		SELECT
+		<include refid="BannerColumns"/>
+		FROM b_banner a
+		<include refid="BannerJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="imgUrl != null and imgUrl != ''">
+				AND a.img_url = #{imgUrl}
+			</if>
+			<if test="flag != null">
+				AND a.flag = #{flag}
+			</if>
+			<if test="param != null and param != ''">
+				AND a.param = #{param}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO b_banner(
+		id,
+		img_url,
+		flag,
+		param,
+		create_date,
+		upd_date,
+		del_status
+		) VALUES (
+		#{id},
+		#{imgUrl},
+		#{flag},
+		#{param},
+		#{createDate},
+		#{updDate},
+		#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE b_banner
+		<set>
+			<if test="imgUrl != null and imgUrl != ''">
+				img_url = #{imgUrl},
+			</if>
+			<if test="flag != null">
+				flag = #{flag},
+			</if>
+			<if test="param != null and param != ''">
+				param = #{param},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE b_banner SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

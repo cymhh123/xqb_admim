@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.posts.dao.ReplyBeanDao">
+    
+	<sql id="replyBeanColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.circle_id AS "circleId",
+		a.to_user AS "toUserId",
+		a.reply_id AS "replyId",
+		a.content AS "content",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus",
+		u1.nick AS nick,
+		u2.nick AS toNick,
+		u1.avatar AS avatar,
+		u2.avatar AS toAvatar
+	</sql>
+	
+	<sql id="replyBeanJoins">
+		LEFT JOIN u_user u1 ON a.user_id = u1.id
+		LEFT JOIN u_user u2 ON a.to_user = u2.id
+	</sql>
+    
+	<select id="get" resultType="ReplyBean">
+		SELECT 
+			<include refid="replyBeanColumns"/>
+		FROM u_circle_reply a
+		<include refid="replyBeanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ReplyBean">
+		SELECT 
+			<include refid="replyBeanColumns"/>
+		FROM u_circle_reply a
+		<include refid="replyBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="circleId != null and circleId != ''">
+				AND a.circle_id = #{circleId}
+			</if>
+		</where>
+		ORDER BY a.create_date ASC
+	</select>
+	<insert id="insert">
+		INSERT INTO u_circle_reply(
+			id,
+			user_id,
+			circle_id,
+			to_user,
+			reply_id,
+			content,
+			create_date,
+			upd_date,
+			del_status
+		) VALUES (
+			#{id},
+			#{userId},
+			#{circleId},
+			#{toUserId},
+			#{replyId},
+			#{content},
+			#{createDate},
+			#{updDate},
+			#{delStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE u_circle_reply SET 	
+			user_id = #{userId},
+			circle_id = #{circleId},
+			to_user = #{toUserId},
+			reply_id = #{replyId},
+			content = #{content},
+			upd_date = #{updDate},
+			del_status = #{delStatus}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE u_circle_reply SET del_status = 1
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

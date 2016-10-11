@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.video.dao.ReplayDao">
+
+	<sql id="replayBeanColumns">
+		a.id AS id,
+		a.comment_id AS commentId,
+		a.content AS content,
+		a.user_id AS userId,
+		a.replay_id AS replayId,
+		a.create_date AS createDate
+	</sql>
+
+	<sql id="replayBeanJoins">
+	</sql>
+
+	<select id="findList" resultType="ReplayBean">
+		SELECT
+		<include refid="replayBeanColumns"/>
+		FROM v_comment_replay a
+		<include refid="replayBeanJoins"/>
+		<where>
+			a.del_flag = 0
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO v_comment_replay (
+		  id,
+		  comment_id,
+		  content,
+		  user_id,
+		  replay_id,
+		  create_date,
+		  del_status,
+		  upd_date
+		)
+		VALUES
+		  (#{id},#{commentId},#{content},#{userId},#{replayId},#{createDate},0,#{updDate})
+	</insert>
+
+	<update id="update">
+	</update>
+
+	<update id="delete">
+		UPDATE v_comment_replay SET
+		del_status = 1
+		WHERE id = #{id}
+	</update>
+
+</mapper>

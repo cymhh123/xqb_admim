@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.res.dao.ResInfoBeanDao">
+    
+	<sql id="resInfoBeanColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.profiles AS "profiles",
+		a.res_url AS "resUrl",
+		a.content AS "content",
+		a.res_type AS "resType",
+		a.thumb_url AS "thumbUrl",
+		a.sorts AS "sorts",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus"
+	</sql>
+	
+	<sql id="resInfoBeanJoins">
+	</sql>
+    
+	<select id="get" resultType="ResInfoBean">
+		SELECT 
+			<include refid="resInfoBeanColumns"/>
+		FROM r_res_info a
+		<include refid="resInfoBeanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ResInfoBean">
+		SELECT 
+			<include refid="resInfoBeanColumns"/>
+		FROM r_res_info a
+		<include refid="resInfoBeanJoins"/>
+		<where>
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="resType != null">
+				AND a.res_type = #{resType}
+			</if>
+			<if test="sorts != null">
+				AND a.sorts = #{sorts}
+			</if>
+				AND a.del_status = 0
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO r_res_info(
+			id,
+			title,
+			profiles,
+			res_url,
+			thumb_url,
+			content,
+			res_type,
+			sorts,
+			create_date,
+			upd_date,
+			del_status
+		) VALUES (
+			#{id},
+			#{title},
+			#{profiles},
+			#{resUrl},
+			#{thumbUrl},
+			#{content},
+			#{resType},
+			#{sorts},
+			#{createDate},
+			#{updDate},
+			#{delStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE r_res_info SET 	
+			title = #{title},
+			profiles = #{profiles},
+			res_url = #{resUrl},
+			content = #{content},
+			res_type = #{resType},
+			upd_date = #{updDate},
+			del_status = #{delStatus}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE r_res_info set del_status=1 WHERE id=#{id}
+	</update>
+
+</mapper>

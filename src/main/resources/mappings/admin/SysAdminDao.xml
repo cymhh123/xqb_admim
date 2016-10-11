@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.admin.dao.SysAdminDao">
+
+	<sql id="SysAdminColumns">
+		a.id AS "id",
+		a.account AS "account",
+		a.password AS "password",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus"
+	</sql>
+
+	<sql id="SysAdminJoins">
+
+	</sql>
+
+	<select id="get" resultType="SysAdmin">
+		SELECT
+		<include refid="SysAdminColumns"/>
+		FROM sys_admin a
+		<include refid="SysAdminJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="SysAdmin">
+		SELECT
+		<include refid="SysAdminColumns"/>
+		FROM sys_admin a
+		<include refid="SysAdminJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="account != null and account != ''">
+				AND a.account LIKE concat('%',#{account},'%')
+			</if>
+			<if test="password != null and password != ''">
+				AND a.password = #{password}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO sys_admin(
+		id,
+		account,
+		password,
+		create_date,
+		upd_date,
+		del_status
+		) VALUES (
+		#{id},
+		#{account},
+		#{password},
+		#{createDate},
+		#{updDate},
+		#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE sys_admin
+		<set>
+			<if test="account != null and account != ''">
+				account = #{account},
+			</if>
+			<if test="password != null and password != ''">
+				password = #{password},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null and updDate != ''">
+				upd_date = #{updDate},
+			</if>
+			<if test="delStatus != null and delStatus != ''">
+				del_status = #{delStatus}
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE sys_admin SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.video.dao.VideoDao">
+
+	<sql id="courseBeanColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.img_url AS "imgUrl",
+		a.teacher_name AS "teacherName",
+		a.play_url AS "playUrl",
+		a.type AS "type",
+		a.profiles AS "profiles",
+		i.push_url AS `liveBean.pushUrl`,
+		i.play_status AS `liveBean.playStatus`,
+		i.start_time AS `liveBean.startTime`,
+		a.create_date AS "createDate"
+	</sql>
+
+	<sql id="courseBeanJoins">
+		LEFT JOIN v_live i ON a.id = i.course_id
+	</sql>
+
+	<select id="get" resultType="VideoBean">
+		SELECT
+		<include refid="courseBeanColumns"/>
+		FROM v_course a
+		<include refid="courseBeanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="VideoBean">
+		SELECT
+		<include refid="courseBeanColumns"/>
+		FROM v_course a
+		<include refid="courseBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="subjectId != null and subjectId != ''">
+				AND a.subject_id = #{subjectId}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert" parameterType="VideoBean">
+		INSERT INTO v_course(
+		id,
+		title,
+		img_url,
+		teacher_name,
+		play_url,
+		subject_id,
+		`type`,
+		profiles,
+		create_date,
+		del_status,
+		upd_date
+		) VALUES (
+		#{id},
+		#{title},
+		#{imgUrl},
+		#{teacherName},
+		#{playUrl},
+		#{subjectId},
+		#{type},
+		#{profiles},
+		#{createDate},
+		#{delStatus},
+		#{updDate}
+		)
+	</insert>
+
+	<insert id="insertLive" parameterType="LiveBean">
+	INSERT INTO v_live (
+	id,
+	course_id,
+	push_url,
+	play_status,
+	start_time,
+	create_date,
+	del_status,
+	upd_date
+	)
+	VALUES
+	(#{id},#{courseId},#{pushUrl},#{playStatus},#{startTime},#{createDate},#{delStatus},#{updDate})
+	</insert>
+
+	<update id="update" parameterType="VideoBean">
+		UPDATE v_course SET
+		title = #{title},
+		img_url = #{imgUrl},
+		teacher_name = #{teacherName},
+		play_url = #{playUrl},
+		subject_id = #{subjectId},
+		`type` = #{type},
+		profiles = #{profiles},
+		create_date = #{createDate},
+		upd_date = #{updDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE v_course SET
+		del_status = 1
+		WHERE id = #{id}
+	</update>
+
+</mapper>

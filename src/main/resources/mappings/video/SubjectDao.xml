@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.video.dao.SubjectDao">
+
+	<sql id="subjectBeanColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.profiles AS "profiles",
+		a.img_url AS "imgUrl",
+		a.price AS "price",
+		a.free_flag AS "freeFlag",
+		a.pub_status AS "pubStatus",
+		a.pub_time AS "pubTime",
+		a.type AS "type",
+		a.label AS "label",
+		a.create_date AS createDate
+	</sql>
+
+	<sql id="subjectBeanJoins">
+	</sql>
+
+	<select id="get" resultType="SubjectBean">
+		SELECT
+		<include refid="subjectBeanColumns"/>
+		FROM v_subject a
+		<include refid="subjectBeanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="SubjectBean">
+		SELECT
+		<include refid="subjectBeanColumns"/>
+		FROM v_subject a
+		<include refid="subjectBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="pubStatus != null and pubStatus !=''">
+				AND a.pub_status = #{pubStatus}
+			</if>
+			<if test="type != null and type !=''">
+				AND a.type = #{type}
+			</if>
+			<if test="label != null and label !=''">
+				AND a.label = #{label}
+			</if>
+			<if test="freeFlag != null and freeFlag !=''">
+				AND a.free_flag = #{freeFlag}
+			</if>
+			<if test="title!=null and title!=''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="editFlag == 'true'">
+				AND a.pub_status IN ('0','2')
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO v_subject(
+		id,
+		title,
+		profiles,
+		img_url,
+		price,
+		free_flag,
+		pub_status,
+		pub_time,
+		`type`,
+		label,
+		start_time,
+		create_date,
+		del_status,
+		upd_date
+		) VALUES (
+		#{id},
+		#{title},
+		#{profiles},
+		#{imgUrl},
+		#{price},
+		#{freeFlag},
+		#{pubStatus},
+		#{pubTime},
+		#{type},
+		#{label},
+		#{startTime},
+		#{createDate},
+		#{delStatus},
+		#{updDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE v_subject
+		<set>
+			<if test="title != null and title != ''">
+				title = #{title},
+			</if>
+			<if test="profiles != null and profiles != ''">
+				profiles = #{profiles},
+			</if>
+			<if test="imgUrl != null and imgUrl != ''">
+				img_url = #{imgUrl},
+			</if>
+			<if test="price != null">
+				price = #{price},
+			</if>
+			<if test="freeFlag != null and freeFlag != ''">
+				free_flag = #{freeFlag},
+			</if>
+			<if test="pubStatus != null and pubStatus != ''">
+				pub_status = #{pubStatus},
+			</if>
+			<if test="pubTime != null">
+				pub_time = #{pubTime},
+			</if>
+			<if test="label != null and label != ''">
+				label = #{label},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE v_subject SET
+		del_status = 1
+		WHERE id = #{id}
+	</update>
+
+	<select id="history" resultType="SubjectBean">
+		SELECT
+		<include refid="subjectBeanColumns"/>
+		FROM v_subject a
+		<include refid="subjectBeanJoins"/>
+		WHERE a.id IN
+		<foreach collection="subjectIdArr" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

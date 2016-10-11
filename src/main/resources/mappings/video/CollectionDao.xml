@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.video.dao.CollectionDao">
+
+	<sql id="collectionBeanColumns">
+		a.id AS "id",
+		a.subject_id AS "subjectId",
+		a.user_id AS "userId",
+		a.create_date AS "createDate",
+		s.id AS "subjectBean.id",
+		s.title AS "subjectBean.title",
+		s.profiles AS "subjectBean.profiles",
+		s.img_url AS "subjectBean.imgUrl",
+		s.price AS "subjectBean.price",
+		s.free_flag AS "subjectBean.freeFlag",
+		s.pub_status AS "subjectBean.pubStatus",
+		s.pub_time AS "subjectBean.pubTime",
+		s.type AS "subjectBean.type",
+		s.label AS "subjectBean.label",
+		s.create_date AS "subjectBean.createDate"
+	</sql>
+
+	<sql id="collectionBeanJoins">
+		LEFT JOIN v_subject s ON a.subject_id = s.id
+	</sql>
+
+	<select id="get" resultType="CollectionBean">
+		SELECT
+		<include refid="collectionBeanColumns"/>
+		FROM v_collection a
+		<include refid="collectionBeanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="CollectionBean">
+		SELECT
+		<include refid="collectionBeanColumns"/>
+		FROM v_collection a
+		<include refid="collectionBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="userId != null and userId != ''">
+				AND a.user_id = #{userId}
+			</if>
+			<if test="subjectId != null and subjectId != ''">
+				AND a.subject_id = #{subjectId}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO v_collection(
+		id,
+		subject_id,
+		user_id,
+		create_date,
+		del_status,
+		upd_date
+		) VALUES (
+		#{id},
+		#{subjectId},
+		#{userId},
+		#{createDate},
+		#{delStatus},
+		#{updDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE v_collection SET
+		subject_id = #{subjectId},
+		user_id = #{userId},
+		create_date = #{createDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE v_collection SET
+		del_status = 1
+		WHERE id = #{id}
+	</update>
+</mapper>

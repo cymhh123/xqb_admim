@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.notice.dao.UserNoticeDao">
+
+	<sql id="UserNoticeColumns">
+		a.id AS "id",
+		a.user_account AS "userAccount",
+		a.notice_id AS "noticeId",
+		a.read_status AS "readStatus",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus",
+		n.id AS "notice.id",
+		n.title AS "notice.title",
+		n.profile AS "notice.profile",
+		n.detail_url AS "notice.detailUrl",
+		n.category AS "notice.category",
+		n.del_status AS "notice.delStatus",
+		n.create_date AS "notice.createDate",
+		n.upd_date AS "notice.updDate",
+		n.content AS "notice.content"
+	</sql>
+
+	<sql id="UserNoticeJoins">
+		LEFT JOIN n_notice n ON a.notice_id = n.id
+	</sql>
+
+	<select id="get" resultType="UserNotice">
+		SELECT
+		<include refid="UserNoticeColumns"/>
+		FROM n_user_notice a
+		<include refid="UserNoticeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="UserNotice">
+		SELECT
+		<include refid="UserNoticeColumns"/>
+		FROM n_user_notice a
+		<include refid="UserNoticeJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="userAccount != null and userAccount != ''">
+				AND a.user_account = #{userAccount}
+			</if>
+			<if test="noticeId != null and noticeId != ''">
+				AND a.notice_id = #{noticeId}
+			</if>
+			<if test="readStatus != null">
+				AND a.read_status = #{readStatus}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO n_user_notice(
+		id,
+		user_account,
+		notice_id,
+		read_status,
+		create_date,
+		upd_date,
+		del_status
+		) VALUES (
+		#{id},
+		#{userAccount},
+		#{noticeId},
+		#{readStatus},
+		#{createDate},
+		#{updDate},
+		#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE n_user_notice
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="userAccount != null and userAccount != ''">
+				user_account = #{userAccount},
+			</if>
+			<if test="noticeId != null and noticeId != ''">
+				notice_id = #{noticeId},
+			</if>
+			<if test="readStatus != null">
+				read_status = #{readStatus},
+			</if>
+			<if test="createDate != null ">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+			<if test="delStatus != null">
+				del_status = #{delStatus}
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE n_user_notice SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

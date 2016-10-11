@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.res.dao.UserResDao">
+
+	<sql id="UserResColumns">
+		a.id AS "id",
+		a.res_id AS "resId",
+		a.user_id AS "userId",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		r.id AS "resInfo.id",
+		r.title AS "resInfo.title",
+		r.profiles AS "resInfo.profiles",
+		r.res_url AS "resInfo.resUrl",
+		r.res_type AS "resInfo.resType",
+		r.thumb_url AS "resInfo.thumbUrl",
+		r.sorts AS "resInfo.sorts",
+		r.create_date AS "resInfo.createDate",
+		r.upd_date AS "resInfo.updDate"
+	</sql>
+
+	<sql id="UserResJoins">
+		LEFT JOIN r_res_info r ON a.res_id = r.id
+	</sql>
+
+	<select id="get" resultType="UserRes">
+		SELECT
+		<include refid="UserResColumns"/>
+		FROM r_user_res a
+		<include refid="UserResJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="UserRes">
+		SELECT
+		<include refid="UserResColumns"/>
+		FROM r_user_res a
+		<include refid="UserResJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="resId != null and resId != ''">
+				AND a.res_id = #{resId}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND a.user_id = #{userId}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+			<if test="sorts != null">
+				AND r.sorts IN
+				<foreach collection="sorts" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO r_user_res(
+		id,
+		res_id,
+		user_id,
+		create_date,
+		upd_date,
+		del_status
+		) VALUES (
+		#{id},
+		#{resId},
+		#{userId},
+		#{createDate},
+		#{updDate},
+		#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE r_user_res
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="resId != null and resId != ''">
+				res_id = #{resId},
+			</if>
+			<if test="userId != null and userId != ''">
+				user_id = #{userId},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null and updDate != ''">
+				upd_date = #{updDate},
+			</if>
+			<if test="delStatus != null and delStatus != ''">
+				del_status = #{delStatus}
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE r_user_res SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

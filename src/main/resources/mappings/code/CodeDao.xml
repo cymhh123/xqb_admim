@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.code.dao.CodeDao">
+
+	<sql id="CodeColumns">
+		a.id AS "id",
+		a.phone AS "phone",
+		a.code AS "code",
+		a.scope AS "scope",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate"
+	</sql>
+
+	<sql id="CodeJoins">
+
+	</sql>
+
+	<select id="get" resultType="Code">
+		SELECT
+		<include refid="CodeColumns"/>
+		FROM u_code a
+		<include refid="CodeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Code">
+		SELECT
+		<include refid="CodeColumns"/>
+		FROM u_code a
+		<include refid="CodeJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="scope != null">
+				AND a.scope = #{scope}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+INSERT INTO u_code (
+  id,
+  phone,
+  `code`,
+  scope,
+  create_date,
+  upd_date,
+  del_status
+)
+VALUES
+  (#{id},#{phone},#{code},#{scope},#{createDate},#{updDate},#{delStatus})
+	</insert>
+
+	<update id="update">
+		UPDATE u_code
+		<set>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+			<if test="code != null and code != ''">
+				code = #{code},
+			</if>
+			<if test="scope != null">
+				scope = #{scope},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate}
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE u_code SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

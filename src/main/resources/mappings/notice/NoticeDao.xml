@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.notice.dao.NoticeDao">
+
+	<sql id="NoticeColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.profile AS "profile",
+		a.detail_url AS "detailUrl",
+		a.category AS "category",
+		a.del_status AS "delStatus",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.content AS "content"
+	</sql>
+
+	<sql id="NoticeJoins">
+
+	</sql>
+
+	<select id="get" resultType="Notice">
+		SELECT
+		<include refid="NoticeColumns"/>
+		FROM n_notice a
+		<include refid="NoticeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Notice">
+		SELECT
+		<include refid="NoticeColumns"/>
+		FROM n_notice a
+		<include refid="NoticeJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="profile != null and profile != ''">
+				AND a.profile = #{profile}
+			</if>
+			<if test="detailUrl != null and detailUrl != ''">
+				AND a.detail_url = #{detailUrl}
+			</if>
+			<if test="category != null">
+				AND a.category = #{category}
+			</if>
+			<if test="delStatus != null">
+				AND a.del_status = #{delStatus}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO n_notice(
+		id,
+		title,
+		profile,
+		detail_url,
+		content,
+		category,
+		del_status,
+		create_date,
+		upd_date
+		) VALUES (
+		#{id},
+		#{title},
+		#{profile},
+		#{detailUrl},
+		#{content},
+		#{category},
+		#{delStatus},
+		#{createDate},
+		#{updDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE n_notice
+		<set>
+			<if test="id != null and id != ''">
+				id = #{id},
+			</if>
+			<if test="title != null and title != ''">
+				title = #{title},
+			</if>
+			<if test="profile != null and profile != ''">
+				profile = #{profile},
+			</if>
+			<if test="detailUrl != null and detailUrl != ''">
+				detail_url = #{detailUrl},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="category != null">
+				category = #{category},
+			</if>
+			<if test="delStatus != null">
+				del_status = #{delStatus},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate}
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE n_notice SET del_status = 1 WHERE id = #{id}
+	</update>
+
+	<select id="listByUserId" parameterType="String" resultType="Notice">
+		SELECT
+		u.read_status AS readStatus,
+		<include refid="NoticeColumns"/>
+		FROM
+		  n_user_notice u
+		  LEFT JOIN n_notice a
+			ON u.`notice_id` = a.`id`
+		WHERE u.`del_status` = 0
+		  AND a.`del_status` = 0
+		  AND u.`user_id` = #{userId}
+	</select>
+</mapper>

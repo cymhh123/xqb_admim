@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.posts.dao.FollowDao">
+
+	<sql id="FollowColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.follow_user_id AS "followUserId",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		u.id AS "followUser.id",
+		u.nick AS "followUser.nick",
+		u.sex AS "followUser.sex",
+		u.phone AS "followUser.phone",
+		u.avatar AS "followUser.imgUrl",
+		u.account AS "followUser.account",
+		u.type AS "followUser.type"
+	</sql>
+
+	<sql id="FollowJoins">
+		LEFT JOIN u_user u ON a.follow_user_id = u.id
+	</sql>
+
+	<select id="get" resultType="Follow">
+		SELECT
+		<include refid="FollowColumns"/>
+		FROM u_follow a
+		<include refid="FollowJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Follow">
+		SELECT
+		<include refid="FollowColumns"/>
+		FROM u_follow a
+		<include refid="FollowJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="userId != null and userId != ''">
+				AND a.user_id = #{userId}
+			</if>
+			<if test="followUserId != null and followUserId != ''">
+				AND a.follow_user_id = #{followUserId}
+			</if>
+			<if test="createDate != null">
+				AND a.create_date = #{createDate}
+			</if>
+			<if test="updDate != null">
+				AND a.upd_date = #{updDate}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO u_follow(
+		id,
+		user_id,
+		follow_user_id,
+		create_date,
+		upd_date,
+		del_status
+		) VALUES (
+		#{id},
+		#{userId},
+		#{followUserId},
+		#{createDate},
+		#{updDate},
+		#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE u_follow
+		<set>
+			<if test="userId != null and userId != ''">
+				user_id = #{userId},
+			</if>
+			<if test="followUserId != null and followUserId != ''">
+				follow_user_id = #{followUserId},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE u_follow SET del_status = 1 WHERE id = #{id}
+	</update>
+
+</mapper>

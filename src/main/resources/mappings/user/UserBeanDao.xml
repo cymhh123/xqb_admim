@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.user.dao.UserBeanDao">
+    
+	<sql id="userBeanColumns">
+		a.id AS "id",
+		a.nick AS "nick",
+		a.sex AS "sex",
+		a.phone AS "phone",
+		a.avatar AS "imgUrl",
+		a.account AS "account",
+		a.type AS "type",
+		a.password AS "password",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus"
+	</sql>
+	
+	<sql id="userBeanJoins">
+	</sql>
+    
+	<select id="get" resultType="UserBean">
+		SELECT 
+			<include refid="userBeanColumns"/>
+		FROM u_user a
+		<include refid="userBeanJoins"/>
+		WHERE a.id = #{id} AND del_status = 0
+	</select>
+	
+	<select id="findList" resultType="UserBean">
+		SELECT 
+			<include refid="userBeanColumns"/>
+		FROM u_user a
+		<include refid="userBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="nick != null and nick != ''">
+				AND a.nick LIKE concat('%',#{nick},'%')
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE concat('%',#{phone},'%')
+			</if>
+			<if test="account != null and account != ''">
+				AND a.account LIKE concat('%',#{account},'%')
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO u_user(
+			id,
+			nick,
+			sex,
+			phone,
+			avatar,
+			account,
+			`type`,
+			password,
+			create_date,
+			upd_date,
+			del_status
+		) VALUES (
+			#{id},
+			#{nick},
+			#{sex},
+			#{phone},
+			#{imgUrl},
+			#{account},
+			#{type},
+			#{password},
+			#{createDate},
+			#{updDate},
+			#{delStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE u_user
+		<set>
+			<if test="sex != null and sex != ''">
+				sex = #{sex},
+			</if>
+			<if test="nick != null and nick != ''">
+				nick = #{nick},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+			<if test="imgUrl != null and imgUrl != ''">
+				avatar = #{imgUrl},
+			</if>
+			<if test="password != null and password != ''">
+				password = #{password},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE u_user SET del_status = 1
+		WHERE id = #{id}
+	</update>
+
+	<select id="findByAccountAndPwd" resultType="UserBean">
+		SELECT
+		<include refid="userBeanColumns"/>
+		FROM u_user a
+		<include refid="userBeanJoins"/>
+		<where>
+			a.del_status = 0
+			AND a.account = #{account}
+			AND a.password = #{password}
+		</where>
+	</select>
+
+	<select id="findByAccount" resultType="UserBean">
+		SELECT
+		<include refid="userBeanColumns"/>
+		FROM u_user a
+		<include refid="userBeanJoins"/>
+		<where>
+			a.del_status = 0
+			AND a.account = #{account}
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqb.modules.video.dao.CommentDao">
+
+	<sql id="commentBeanColumns">
+		a.id AS id,
+		a.subject_course_id AS subjectCourseId,
+		a.content AS content,
+		a.user_id AS userId,
+		a.`type` AS `type`,
+		a.create_date AS createDate,
+		r.id AS r_id,
+		r.comment_id AS commentId,
+		r.user_id AS r_userId,
+		r.replay_id AS replayId,
+		r.content AS r_content,
+		r.create_date AS r_createTime,
+		p.nick AS userName,
+		p.avatar AS avatar,
+		e.nick AS r_userName,
+		e.avatar AS r_userAvatar,
+		s.nick AS r_replayName,
+		s.avatar AS r_replayAvatar
+	</sql>
+
+	<resultMap type="CommentBean" id="commentMap">
+		<id property="id" column="id"/>
+		<result property="subjectCourseId" column="subjectCourseId"/>
+		<result property="content" column="content"/>
+		<result property="userId" column="userId"/>
+		<result property="type" column="type"/>
+		<result property="createDate" column="createDate"/>
+		<result property="userName" column="userName"/>
+		<result property="avatar" column="avatar"/>
+		<!-- ofType指定students集合中的对象类型 -->
+		<collection property="replays" ofType="ReplayBean">
+			<id property="id" column="r_id"/>
+			<result property="commentId" column="commentId"/>
+			<result property="userId" column="r_userId"/>
+			<result property="replayId" column="replayId"/>
+			<result property="content" column="r_content"/>
+			<result property="createDate" column="r_createTime"/>
+			<result property="userName" column="r_userName"/>
+			<result property="userAvatar" column="r_userAvatar"/>
+			<result property="replayName" column="r_replayName"/>
+			<result property="replayAvatar" column="r_replayAvatar"/>
+		</collection>
+	</resultMap>
+
+	<sql id="commentBeanJoins">
+		LEFT JOIN v_comment_replay r ON a.id = r.comment_id
+		LEFT JOIN u_user p ON a.user_id = p.id
+		LEFT JOIN u_user e ON r.user_id = e.id
+		LEFT JOIN u_user s ON r.replay_id = s.id
+	</sql>
+
+	<select id="findList" resultMap="commentMap">
+		SELECT
+		<include refid="commentBeanColumns"/>
+		FROM v_comment a
+		<include refid="commentBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="type != null and type !=''">
+				AND a.type = #{type}
+			</if>
+			<if test="subjectCourseId !=null and subjectCourseId!=''">
+				AND a.subject_course_id = #{subjectCourseId}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+
+	<insert id="insert">
+		INSERT INTO v_comment (
+		id,
+		subject_course_id,
+		content,
+		user_id,
+		`type`,
+		create_date,
+		del_status,
+		upd_date
+		)
+		VALUES
+		(#{id},#{subjectCourseId},#{content},#{userId},#{type},#{createDate},0,#{updDate})
+	</insert>
+
+
+	<update id="delete">
+		UPDATE v_comment SET
+		del_status = 1
+		WHERE id = #{id}
+	</update>
+
+</mapper>

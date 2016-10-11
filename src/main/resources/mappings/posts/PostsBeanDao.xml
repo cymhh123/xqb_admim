@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdzy.xqbadmin.modules.posts.dao.PostsBeanDao">
+    
+	<sql id="postsBeanColumns">
+		a.id AS "id",
+		a.circle_id AS "circleId",
+		a.user_id AS "userId",
+		a.content AS "content",
+		a.img_url AS "imgUrl",
+		a.click_num AS "clickNum",
+		a.like_num AS "likeNum",
+		a.praise_num AS "praiseNum",
+		a.create_date AS "createDate",
+		a.upd_date AS "updDate",
+		a.del_status AS "delStatus",
+		u.nick AS nick,
+		c.title AS title,
+		u.avatar AS avatar
+	</sql>
+	
+	<sql id="postsBeanJoins">
+		LEFT JOIN u_user u ON u.id = a.user_id
+		LEFT JOIN u_circle c ON a.circle_id = c.id
+	</sql>
+    
+	<select id="get" resultType="PostsBean">
+		SELECT 
+			<include refid="postsBeanColumns"/>
+		FROM u_circle_list a
+		<include refid="postsBeanJoins"/>
+		WHERE a.id = #{id} AND a.del_status = 0
+	</select>
+	
+	<select id="findList" resultType="PostsBean">
+		SELECT 
+			<include refid="postsBeanColumns"/>
+		FROM u_circle_list a
+		<include refid="postsBeanJoins"/>
+		<where>
+			a.del_status = 0
+			<if test="title != null and title != ''">
+				AND c.title LIKE concat('%',#{title},'%')
+			</if>
+			<if test="nick != null and nick != ''">
+				AND u.nick LIKE concat('%',#{nick},'%')
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content LIKE concat('%',#{content},'%')
+			</if>
+			<if test="circleId != null and circleId !=''">
+				AND a.circle_id = #{circleId}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND a.user_id = #{userId}
+			</if>
+		</where>
+		ORDER BY a.create_date DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO u_circle_list(
+			id,
+			circle_id,
+			user_id,
+			content,
+			img_url,
+			click_num,
+			like_num,
+			praise_num,
+			create_date,
+			upd_date,
+			del_status
+		) VALUES (
+			#{id},
+			#{circleId},
+			#{userId},
+			#{content},
+			#{imgUrl},
+			#{clickNum},
+			#{likeNum},
+			#{praiseNum},
+			#{createDate},
+			#{updDate},
+			#{delStatus}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE u_circle_list
+		<set>
+			<if test="circleId != null and circleId != ''">
+				circle_id = #{circleId},
+			</if>
+			<if test="userId != null and userId != ''">
+				user_id = #{userId},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="imgUrl != null and imgUrl != ''">
+				img_url = #{imgUrl},
+			</if>
+			<if test="clickNum != null">
+				click_num = #{clickNum},
+			</if>
+			<if test="likeNum != null">
+				like_num = #{likeNum},
+			</if>
+			<if test="praiseNum != null">
+				praise_num = #{praiseNum},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="updDate != null">
+				upd_date = #{updDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE u_circle_list SET del_status=1
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
